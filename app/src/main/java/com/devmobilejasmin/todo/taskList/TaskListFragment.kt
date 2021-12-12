@@ -28,35 +28,19 @@ import java.util.*
 
 class TaskListFragment : Fragment() {
 
-    private var taskList = listOf(
-        Task(id = "id_1", title = "Task 1", description = "description 1"),
-        Task(id = "id_2", title = "Task 2"),
-        Task(id = "id_3", title = "Task 3")
-    )
-
-
     val formLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val task = result.data?.getSerializableExtra("task") as Task
 
-
-
-        taskList = taskList + task;
-        adapter.taskList = taskList
-        adapter.notifyItemInserted(taskList.size)
-
-        // ici on récupérera le résultat pour le traiter
+        lifecycleScope.launch {
+            tasksRepository.createOrUpdate(task)
+            //tasksRepository.refresh() // refresh after change
+        }
     }
 
-    val adapter = TaskListAdapter(taskList)
+    val adapter = TaskListAdapter(listOf())
     var infoTextView = view?.findViewById<TextView>(R.id.info_text)
 
     private val tasksRepository = TasksRepository()
-
-
-
-
-
-
 
 
 
@@ -74,19 +58,12 @@ class TaskListFragment : Fragment() {
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(activity)
-        //val adapter = TaskListAdapter(taskList)
         recyclerView.adapter = adapter
+
 
         view.findViewById<FloatingActionButton>(R.id.add_task_button).setOnClickListener {
             val intent = Intent(activity, FormActivity::class.java)
             formLauncher.launch(intent)
-
-            //val newTask = Task(id = UUID.randomUUID().toString(), title = "Task ${taskList.size + 1}")
-            //taskList = taskList + newTask
-            //view.findViewById<RecyclerView>(R.id.recycler_view).adapter?.notifyItemChanged(taskList.size-1, taskList);
-
-            adapter.taskList = taskList
-            adapter.notifyItemInserted(taskList.size)
         }
 
 
@@ -98,29 +75,16 @@ class TaskListFragment : Fragment() {
 
         infoTextView = view.findViewById<TextView>(R.id.info_text)
 
-
-        /*
-        formLauncher.runCatching {
-            val task = result.data?.getSerializableExtra("task") as? Task
-        }
-        */
-
         adapter.onClickDelete = {task ->
-            taskList = taskList - task
-            adapter.taskList = taskList
-            adapter.notifyDataSetChanged()
+            lifecycleScope.launch {
+                tasksRepository.delete(task)
+            }
         }
 
         adapter.onClickEdit = {task ->
-
-            taskList = taskList - task
-            adapter.taskList = taskList
-            adapter.notifyDataSetChanged()
-
             val intent = Intent(activity, FormActivity::class.java)
             intent.putExtra("task", task)
             formLauncher.launch(intent)
-
         }
 
         // Dans onViewCreated()

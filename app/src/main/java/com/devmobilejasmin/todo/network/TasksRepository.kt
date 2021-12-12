@@ -45,7 +45,13 @@ class TasksRepository {
         val newTask = tasksWebService.create(task).body() ?: return
         _taskList.value = taskList.value + newTask
     }
-    suspend fun delete(){
 
+
+    suspend fun delete(task: Task){
+        val response = tasksWebService.delete(task.id)
+
+        if (response.isSuccessful){
+            if(task != null) _taskList.value = taskList.value - task
+        }
     }
 }
