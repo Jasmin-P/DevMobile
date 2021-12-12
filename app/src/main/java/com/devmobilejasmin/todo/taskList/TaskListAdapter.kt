@@ -4,11 +4,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ListAdapter
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.devmobilejasmin.todo.R
 
-class TaskListAdapter (public var taskList: List<Task>) : RecyclerView.Adapter<TaskListAdapter.TaskViewHolder>() {
+
+object TasksDiffCallback : DiffUtil.ItemCallback<Task>() {
+    override fun areItemsTheSame(oldItem: Task, newItem: Task) = oldItem.id == newItem.id
+        // are they the same "entity" ? (usually same id)
+        override fun areContentsTheSame(oldItem: Task, newItem: Task) = oldItem.equals(newItem)
+    // do they have the same data ? (content)
+}
+
+
+class TaskListAdapter : androidx.recyclerview.widget.ListAdapter<Task, TaskListAdapter.TaskViewHolder>(TasksDiffCallback) {
 
     var onClickDelete: (Task) -> Unit = {}
     var onClickEdit: (Task) -> Unit = {}
@@ -37,14 +48,8 @@ class TaskListAdapter (public var taskList: List<Task>) : RecyclerView.Adapter<T
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-        holder.bind(taskList[position])
+        holder.bind(getItem(position))
 
 
     }
-
-    override fun getItemCount(): Int {
-        return taskList.count()
-    }
-
-
 }

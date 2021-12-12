@@ -37,7 +37,7 @@ class TaskListFragment : Fragment() {
         }
     }
 
-    val adapter = TaskListAdapter(listOf())
+    val adapter = TaskListAdapter()
     var infoTextView = view?.findViewById<TextView>(R.id.info_text)
 
     private val tasksRepository = TasksRepository()
@@ -94,7 +94,7 @@ class TaskListFragment : Fragment() {
                 // cette lambda est executée à chaque fois que la liste est mise à jour dans le repository
                 // on met à jour la liste dans l'adapteur
 
-                adapter.taskList = newList
+                adapter.submitList(newList)
                 adapter.notifyDataSetChanged()
 
             }
