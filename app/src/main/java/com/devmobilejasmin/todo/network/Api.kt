@@ -10,7 +10,7 @@ object Api {
 
     // constantes qui serviront à faire les requêtes
     private const val BASE_URL = "https://android-tasks-api.herokuapp.com/api/"
-    private const val TOKEN = "COPIEZ_VOTRE_TOKEN_ICI"
+    private const val TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo1NTEsImV4cCI6MTY3MDM0MTkzMH0.picRf_HiYukob3tlwYpPly84a04xIiOZJxzqhq2c2oQ"
 
     // client HTTP
     private val okHttpClient by lazy {
@@ -42,4 +42,14 @@ object Api {
         .client(okHttpClient)
         .addConverterFactory(converterFactory)
         .build()
+
+    val userWebService by lazy {
+        retrofit.create(UserWebService::class.java)
+    }
+
+    val taskWebService by lazy {
+        retrofit.create(TaskWebService::class.java)
+    }
+
+
 }

@@ -6,14 +6,24 @@ import android.service.autofill.OnClickAction
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devmobilejasmin.todo.R
 import com.devmobilejasmin.todo.form.FormActivity
+import com.devmobilejasmin.todo.network.Api
+import com.devmobilejasmin.todo.network.TasksRepository
+import com.devmobilejasmin.todo.network.UserInfo
+import com.devmobilejasmin.todo.network.UserWebService
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
 import java.util.*
 
 class TaskListFragment : Fragment() {
@@ -38,6 +48,17 @@ class TaskListFragment : Fragment() {
     }
 
     val adapter = TaskListAdapter(taskList)
+    var infoTextView = view?.findViewById<TextView>(R.id.info_text)
+
+    private val tasksRepository = TasksRepository()
+
+
+
+
+
+
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,6 +89,16 @@ class TaskListFragment : Fragment() {
             adapter.notifyItemInserted(taskList.size)
         }
 
+
+        view.findViewById<FloatingActionButton>(R.id.reload_task_button).setOnClickListener {
+            lifecycleScope.launch {
+                tasksRepository.refresh() // on demande de rafraîchir les données sans attendre le retour directement
+            }
+        }
+
+        infoTextView = view.findViewById<TextView>(R.id.info_text)
+
+
         /*
         formLauncher.runCatching {
             val task = result.data?.getSerializableExtra("task") as? Task
@@ -91,5 +122,35 @@ class TaskListFragment : Fragment() {
             formLauncher.launch(intent)
 
         }
+
+        // Dans onViewCreated()
+        lifecycleScope.launch { // on lance une coroutine car `collect` est `suspend`
+            tasksRepository.taskList.collect { newList ->
+
+                // cette lambda est executée à chaque fois que la liste est mise à jour dans le repository
+                // on met à jour la liste dans l'adapteur
+
+                adapter.taskList = newList
+                adapter.notifyDataSetChanged()
+
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        lifecycleScope.launch {
+            val userInfo = Api.userWebService.getInfo().body()!!
+            infoTextView?.text = "${userInfo.firstName} ${userInfo.lastName}"
+        }
+
+
+        // Dans onResume()
+        lifecycleScope.launch {
+            tasksRepository.refresh() // on demande de rafraîchir les données sans attendre le retour directement
+        }
+
+
     }
 }
