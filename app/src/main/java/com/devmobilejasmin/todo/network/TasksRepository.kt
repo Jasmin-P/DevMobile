@@ -10,11 +10,12 @@ class TasksRepository {
 
     // Ces deux variables encapsulent la même donnée:
     // [_taskList] est modifiable mais privée donc inaccessible à l'extérieur de cette classe
-    private val _taskList = MutableStateFlow<List<Task>>(value = emptyList())
+    //private val _taskList = MutableStateFlow<List<Task>>(value = emptyList())
     // [taskList] est publique mais non-modifiable:
     // On pourra seulement l'observer (s'y abonner) depuis d'autres classes
-    public val taskList: StateFlow<List<Task>> = _taskList.asStateFlow()
+    //public val taskList: StateFlow<List<Task>> = _taskList.asStateFlow()
 
+    /*
     suspend fun refresh() {
         // Call HTTP (opération longue):
         val tasksResponse = tasksWebService.getTasks()
@@ -25,7 +26,10 @@ class TasksRepository {
             if (fetchedTasks != null) _taskList.value = fetchedTasks
         }
     }
+    */
 
+
+    /*
     suspend fun createOrUpdate(task: Task){
         val response = tasksWebService.update(task, task.id)
 
@@ -46,12 +50,27 @@ class TasksRepository {
         _taskList.value = taskList.value + newTask
     }
 
+     */
+
 
     suspend fun delete(task: Task){
         val response = tasksWebService.delete(task.id)
+    }
 
-        if (response.isSuccessful){
-            if(task != null) _taskList.value = taskList.value - task
+    suspend fun loadTasks(): List<Task>? {
+        val response = tasksWebService.getTasks()
+        return if (response.isSuccessful) response.body() else null
+    }
+
+    suspend fun createOrUpdate(task: Task): Task? {
+        val response = tasksWebService.update(task, task.id)
+
+        val updatedTask = response.body()
+        if (response.isSuccessful && updatedTask != null){
+            return updatedTask
         }
+
+        val newTask = tasksWebService.create(task).body()
+        return newTask
     }
 }

@@ -10,15 +10,13 @@ import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devmobilejasmin.todo.R
 import com.devmobilejasmin.todo.form.FormActivity
-import com.devmobilejasmin.todo.network.Api
-import com.devmobilejasmin.todo.network.TasksRepository
-import com.devmobilejasmin.todo.network.UserInfo
-import com.devmobilejasmin.todo.network.UserWebService
+import com.devmobilejasmin.todo.network.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.collect
@@ -31,16 +29,14 @@ class TaskListFragment : Fragment() {
     val formLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val task = result.data?.getSerializableExtra("task") as Task
 
-        lifecycleScope.launch {
-            tasksRepository.createOrUpdate(task)
-            //tasksRepository.refresh() // refresh after change
-        }
+        viewModel.createOrUpdate(task)
     }
 
     val adapter = TaskListAdapter()
-    var infoTextView = view?.findViewById<TextView>(R.id.info_text)
 
-    private val tasksRepository = TasksRepository()
+    private val viewModel: TaskListViewModel by viewModels()
+
+    var infoTextView = view?.findViewById<TextView>(R.id.info_text)
 
 
 
@@ -60,6 +56,8 @@ class TaskListFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerView.adapter = adapter
 
+        infoTextView = view.findViewById<TextView>(R.id.info_text)
+
 
         view.findViewById<FloatingActionButton>(R.id.add_task_button).setOnClickListener {
             val intent = Intent(activity, FormActivity::class.java)
@@ -68,17 +66,12 @@ class TaskListFragment : Fragment() {
 
 
         view.findViewById<FloatingActionButton>(R.id.reload_task_button).setOnClickListener {
-            lifecycleScope.launch {
-                tasksRepository.refresh() // on demande de rafraîchir les données sans attendre le retour directement
-            }
+            viewModel.refresh() // on demande de rafraîchir les données sans attendre le retour directement
         }
 
-        infoTextView = view.findViewById<TextView>(R.id.info_text)
 
         adapter.onClickDelete = {task ->
-            lifecycleScope.launch {
-                tasksRepository.delete(task)
-            }
+            viewModel.delete(task)
         }
 
         adapter.onClickEdit = {task ->
@@ -89,7 +82,7 @@ class TaskListFragment : Fragment() {
 
         // Dans onViewCreated()
         lifecycleScope.launch { // on lance une coroutine car `collect` est `suspend`
-            tasksRepository.taskList.collect { newList ->
+            viewModel.taskList.collect { newList ->
 
                 // cette lambda est executée à chaque fois que la liste est mise à jour dans le repository
                 // on met à jour la liste dans l'adapteur
@@ -103,17 +96,21 @@ class TaskListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        viewModel.refresh()
+
 
         lifecycleScope.launch {
             val userInfo = Api.userWebService.getInfo().body()!!
             infoTextView?.text = "${userInfo.firstName} ${userInfo.lastName}"
         }
 
-
+        /*
         // Dans onResume()
         lifecycleScope.launch {
             tasksRepository.refresh() // on demande de rafraîchir les données sans attendre le retour directement
         }
+
+         */
 
 
     }

@@ -49,7 +49,5 @@ class TaskListAdapter : androidx.recyclerview.widget.ListAdapter<Task, TaskListA
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         holder.bind(getItem(position))
-
-
     }
 }
