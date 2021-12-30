@@ -1,0 +1,16 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.modernstorage:modernstorage-mediastore:1.0.0-alpha02@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/fa58840766eaa95701f0c247b920245b/transformed/jetified-modernstorage-mediastore-1.0.0-alpha02/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/7cf994a7e0d2445f76b89aed2fb7df60/transformed/jetified-modernstorage-mediastore-1.0.0-alpha02/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/7cf994a7e0d2445f76b89aed2fb7df60/transformed/jetified-modernstorage-mediastore-1.0.0-alpha02/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/7cf994a7e0d2445f76b89aed2fb7df60/transformed/jetified-modernstorage-mediastore-1.0.0-alpha02/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.modernstorage/modernstorage-mediastore/1.0.0-alpha02/d43c6751c85ec32c25087f5c20f55144551495c4/modernstorage-mediastore-1.0.0-alpha02-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.modernstorage/modernstorage-mediastore/1.0.0-alpha02/eabedc0f7678e00fb0c51eaa5801160150e9cfbb/modernstorage-mediastore-1.0.0-alpha02-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

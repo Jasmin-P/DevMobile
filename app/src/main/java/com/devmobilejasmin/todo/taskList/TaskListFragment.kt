@@ -6,6 +6,7 @@ import android.service.autofill.OnClickAction
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,10 +15,16 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import coil.transform.CircleCropTransformation
 import com.devmobilejasmin.todo.R
 import com.devmobilejasmin.todo.form.FormActivity
 import com.devmobilejasmin.todo.network.*
+import com.devmobilejasmin.todo.user.UserInfo
+import com.devmobilejasmin.todo.user.UserInfoActivity
+import com.devmobilejasmin.todo.user.UserInfoViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -32,11 +39,23 @@ class TaskListFragment : Fragment() {
         viewModel.createOrUpdate(task)
     }
 
+    val userActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val userInfo = result.data?.getSerializableExtra("userInfo") as UserInfo
+
+        infoTextView?.text = "${userInfo.firstName} ${userInfo.lastName}"
+        avatarImageView?.load(userInfo?.avatar) {
+            // affiche une image par défaut en cas d'erreur:
+            error(R.drawable.ic_launcher_background)
+            transformations(CircleCropTransformation())
+        }
+    }
+
     val adapter = TaskListAdapter()
 
     private val viewModel: TaskListViewModel by viewModels()
 
     var infoTextView = view?.findViewById<TextView>(R.id.info_text)
+    var avatarImageView = view?.findViewById<ImageView>(R.id.avatar_image)
 
 
 
@@ -57,6 +76,7 @@ class TaskListFragment : Fragment() {
         recyclerView.adapter = adapter
 
         infoTextView = view.findViewById<TextView>(R.id.info_text)
+        avatarImageView = view.findViewById<ImageView>(R.id.avatar_image)
 
 
         view.findViewById<FloatingActionButton>(R.id.add_task_button).setOnClickListener {
@@ -67,6 +87,11 @@ class TaskListFragment : Fragment() {
 
         view.findViewById<FloatingActionButton>(R.id.reload_task_button).setOnClickListener {
             viewModel.refresh() // on demande de rafraîchir les données sans attendre le retour directement
+        }
+
+        view.findViewById<ImageView>(R.id.avatar_image).setOnClickListener {
+            val intent = Intent(activity, UserInfoActivity::class.java)
+            userActivityLauncher.launch(intent)
         }
 
 
@@ -92,26 +117,20 @@ class TaskListFragment : Fragment() {
 
             }
         }
+
+        lifecycleScope.launch {
+            val userInfo = Api.userWebService.getInfo().body()!!
+            infoTextView?.text = "${userInfo.firstName} ${userInfo.lastName}"
+            avatarImageView?.load(userInfo?.avatar) {
+                // affiche une image par défaut en cas d'erreur:
+                error(R.drawable.ic_launcher_background)
+                transformations(CircleCropTransformation())
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
         viewModel.refresh()
-
-
-        lifecycleScope.launch {
-            val userInfo = Api.userWebService.getInfo().body()!!
-            infoTextView?.text = "${userInfo.firstName} ${userInfo.lastName}"
-        }
-
-        /*
-        // Dans onResume()
-        lifecycleScope.launch {
-            tasksRepository.refresh() // on demande de rafraîchir les données sans attendre le retour directement
-        }
-
-         */
-
-
     }
 }

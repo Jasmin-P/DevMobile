@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/user_first_name"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:text="First_name" />
+
+    <TextView
+        android:id="@+id/user_last_name"
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:text="Last_name" />
+
+    <TextView
+        android:id="@+id/user_email_adress"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:text="Email_adress" />
+
+    <Button
+        android:id="@+id/modify_user_information"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        android:text="Modifier les informations" />
+
+    <ImageView
+        android:id="@+id/current_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <Button
+        android:id="@+id/upload_image_button"
+        android:layout_width="match_parent"
+        android:layout_height="69dp"
+        android:text="Choisir une Image" />
+
+    <Button
+        android:id="@+id/take_picture_button"
+        android:layout_width="match_parent"
+        android:layout_height="67dp"
+        android:text="Prendre une photo" />
+
+    <Button
+        android:id="@+id/User_modification_validation_button"
+        android:layout_width="match_parent"
+        android:layout_height="66dp"
+        android:insetLeft="100dp"
+        android:insetRight="100dp"
+        android:backgroundTint="@android:color/holo_green_dark"
+        android:text="Valider" />
+</LinearLayout>
