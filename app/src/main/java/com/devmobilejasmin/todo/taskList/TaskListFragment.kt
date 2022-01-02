@@ -2,17 +2,21 @@ package com.devmobilejasmin.todo.taskList
 
 import android.content.Intent
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.service.autofill.OnClickAction
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -57,6 +61,8 @@ class TaskListFragment : Fragment() {
     var infoTextView = view?.findViewById<TextView>(R.id.info_text)
     var avatarImageView = view?.findViewById<ImageView>(R.id.avatar_image)
 
+    val SHARED_PREF_TOKEN_KEY = "auth_token_key"
+
 
 
     override fun onCreateView(
@@ -94,6 +100,13 @@ class TaskListFragment : Fragment() {
             userActivityLauncher.launch(intent)
         }
 
+        view.findViewById<Button>(R.id.deconnexion_button).setOnClickListener {
+            PreferenceManager.getDefaultSharedPreferences(context).edit {
+                putString(SHARED_PREF_TOKEN_KEY, "error")
+            }
+            findNavController().navigate(R.id.action_taskListFragment_to_authenticationFragment)
+        }
+
 
         adapter.onClickDelete = {task ->
             viewModel.delete(task)
@@ -114,18 +127,23 @@ class TaskListFragment : Fragment() {
 
                 adapter.submitList(newList)
                 adapter.notifyDataSetChanged()
-
             }
         }
 
         lifecycleScope.launch {
-            val userInfo = Api.userWebService.getInfo().body()!!
-            infoTextView?.text = "${userInfo.firstName} ${userInfo.lastName}"
+            val userInfo = Api.userWebService.getInfo().body()
+            infoTextView?.text = "${userInfo?.firstName} ${userInfo?.lastName}"
             avatarImageView?.load(userInfo?.avatar) {
                 // affiche une image par défaut en cas d'erreur:
                 error(R.drawable.ic_launcher_background)
                 transformations(CircleCropTransformation())
             }
+        }
+
+
+        val token = PreferenceManager.getDefaultSharedPreferences(Api.appContext).getString(SHARED_PREF_TOKEN_KEY, "error")
+        if (token == null || token == "error"){
+            findNavController().navigate(R.id.action_taskListFragment_to_authenticationFragment)
         }
     }
 
@@ -133,4 +151,9 @@ class TaskListFragment : Fragment() {
         super.onResume()
         viewModel.refresh()
     }
+
+    /*
+    android:maxSdkVersion="28"
+        tools:replace="android:maxSdkVersion"
+     */
 }

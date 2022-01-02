@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/taskListFragment">
+
+    <fragment
+        android:id="@+id/authenticationFragment"
+        android:name="com.devmobilejasmin.todo.user.AuthenticationFragment"
+        android:label="fragment_authentication"
+        tools:layout="@layout/fragment_authentication" >
+        <action
+            android:id="@+id/action_authenticationFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_authenticationFragment_to_signupFragment"
+            app:destination="@id/signupFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.devmobilejasmin.todo.user.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_taskListFragment"
+            app:destination="@id/taskListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/signupFragment"
+        android:name="com.devmobilejasmin.todo.user.SignupFragment"
+        android:label="fragment_signup"
+        tools:layout="@layout/fragment_signup" >
+        <action
+            android:id="@+id/action_signupFragment_to_taskListFragment"
+            app:destination="@id/taskListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/taskListFragment"
+        android:name="com.devmobilejasmin.todo.taskList.TaskListFragment"
+        android:label="TaskListFragment" >
+        <action
+            android:id="@+id/action_taskListFragment_to_authenticationFragment"
+            app:destination="@id/authenticationFragment" />
+        <action
+            android:id="@+id/action_taskListFragment_to_formActivity"
+            app:destination="@id/formActivity" />
+    </fragment>
+    <activity
+        android:id="@+id/formActivity"
+        android:name="com.devmobilejasmin.todo.form.FormActivity"
+        android:label="activity_user_form"
+        tools:layout="@layout/activity_user_form" />
+</navigation>
