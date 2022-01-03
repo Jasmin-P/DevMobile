@@ -44,11 +44,18 @@
             app:destination="@id/authenticationFragment" />
         <action
             android:id="@+id/action_taskListFragment_to_formActivity"
-            app:destination="@id/formActivity" />
+            app:destination="@id/formFragment" />
+        <action
+            android:id="@+id/action_taskListFragment_to_userInfoActivity"
+            app:destination="@id/userInfoActivity" />
     </fragment>
-    <activity
-        android:id="@+id/formActivity"
+    <fragment
+        android:id="@+id/formFragment"
         android:name="com.devmobilejasmin.todo.form.FormActivity"
-        android:label="activity_user_form"
-        tools:layout="@layout/activity_user_form" />
+        android:label="fragment_form"
+        tools:layout="@layout/fragment_form" />
+    <fragment
+        android:id="@+id/userInfoActivity"
+        android:name="com.devmobilejasmin.todo.user.UserInfoActivity"
+        android:label="UserInfoActivity" />
 </navigation>

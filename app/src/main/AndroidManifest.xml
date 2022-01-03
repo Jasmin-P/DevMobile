@@ -23,18 +23,12 @@
         <activity
             android:name=".user.AuthenticationActivity"
             android:exported="true" >
-
         </activity>
 
         <activity
             android:name=".user.UserFormActivity"
             android:exported="true" />
-        <activity
-            android:name=".user.UserInfoActivity"
-            android:exported="true" />
-        <activity
-            android:name=".form.FormActivity"
-            android:exported="true" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true">

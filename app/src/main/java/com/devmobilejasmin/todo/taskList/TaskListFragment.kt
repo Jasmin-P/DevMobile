@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.service.autofill.OnClickAction
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +25,8 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.transform.CircleCropTransformation
 import com.devmobilejasmin.todo.R
+import com.devmobilejasmin.todo.databinding.FragmentFormBinding
+import com.devmobilejasmin.todo.databinding.FragmentTaskListBinding
 import com.devmobilejasmin.todo.form.FormActivity
 import com.devmobilejasmin.todo.network.*
 import com.devmobilejasmin.todo.user.UserInfo
@@ -37,17 +42,11 @@ import java.util.*
 
 class TaskListFragment : Fragment() {
 
-    val formLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val task = result.data?.getSerializableExtra("task") as Task
-
-        viewModel.createOrUpdate(task)
-    }
-
     val userActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val userInfo = result.data?.getSerializableExtra("userInfo") as UserInfo
 
-        infoTextView?.text = "${userInfo.firstName} ${userInfo.lastName}"
-        avatarImageView?.load(userInfo?.avatar) {
+        binding.infoText.text = "${userInfo.firstName} ${userInfo.lastName}"
+        binding.avatarImage.load(userInfo?.avatar) {
             // affiche une image par défaut en cas d'erreur:
             error(R.drawable.ic_launcher_background)
             transformations(CircleCropTransformation())
@@ -58,11 +57,11 @@ class TaskListFragment : Fragment() {
 
     private val viewModel: TaskListViewModel by viewModels()
 
-    var infoTextView = view?.findViewById<TextView>(R.id.info_text)
-    var avatarImageView = view?.findViewById<ImageView>(R.id.avatar_image)
-
     val SHARED_PREF_TOKEN_KEY = "auth_token_key"
 
+
+    private var _binding: FragmentTaskListBinding? = null
+    private val binding get() = _binding!!
 
 
     override fun onCreateView(
@@ -70,37 +69,38 @@ class TaskListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_task_list, container, false)
-        return rootView
+
+        _binding = FragmentTaskListBinding.inflate(inflater, container, false)
+        val view = binding.root
+
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
+
+        val recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerView.adapter = adapter
 
-        infoTextView = view.findViewById<TextView>(R.id.info_text)
-        avatarImageView = view.findViewById<ImageView>(R.id.avatar_image)
 
-
-        view.findViewById<FloatingActionButton>(R.id.add_task_button).setOnClickListener {
-            val intent = Intent(activity, FormActivity::class.java)
-            formLauncher.launch(intent)
+        binding.addTaskButton.setOnClickListener {
+            setNavigationInfo(Task("","",""), "modifiedTask")
+            findNavController().navigate(R.id.action_taskListFragment_to_formActivity)
         }
 
 
-        view.findViewById<FloatingActionButton>(R.id.reload_task_button).setOnClickListener {
+        binding.reloadTaskButton.setOnClickListener {
             viewModel.refresh() // on demande de rafraîchir les données sans attendre le retour directement
         }
 
-        view.findViewById<ImageView>(R.id.avatar_image).setOnClickListener {
-            val intent = Intent(activity, UserInfoActivity::class.java)
-            userActivityLauncher.launch(intent)
+        binding.avatarImage.setOnClickListener {
+            findNavController().navigate(R.id.action_taskListFragment_to_userInfoActivity)
+
         }
 
-        view.findViewById<Button>(R.id.deconnexion_button).setOnClickListener {
+        binding.deconnexionButton.setOnClickListener {
             PreferenceManager.getDefaultSharedPreferences(context).edit {
                 putString(SHARED_PREF_TOKEN_KEY, "error")
             }
@@ -113,10 +113,28 @@ class TaskListFragment : Fragment() {
         }
 
         adapter.onClickEdit = {task ->
-            val intent = Intent(activity, FormActivity::class.java)
-            intent.putExtra("task", task)
-            formLauncher.launch(intent)
+            setNavigationInfo(task, "modifiedTask")
+            findNavController().navigate(R.id.action_taskListFragment_to_formActivity)
         }
+
+        val resultTask = this.getNavigationResultLiveData<Task>("modifiedTask")
+        resultTask?.observe(viewLifecycleOwner){ task->
+            viewModel.createOrUpdate(task)
+        }
+
+        /*
+        val resultUser = this.getNavigationResultLiveData<UserInfo>("user")
+        resultUser?.observe(viewLifecycleOwner){ userInfo ->
+            binding.infoText.text = "${userInfo.firstName} ${userInfo.lastName}"
+            binding.avatarImage.load(userInfo?.avatar) {
+                // affiche une image par défaut en cas d'erreur:
+                error(R.drawable.ic_launcher_background)
+                transformations(CircleCropTransformation())
+            }
+        }
+
+         */
+
 
         // Dans onViewCreated()
         lifecycleScope.launch { // on lance une coroutine car `collect` est `suspend`
@@ -132,8 +150,8 @@ class TaskListFragment : Fragment() {
 
         lifecycleScope.launch {
             val userInfo = Api.userWebService.getInfo().body()
-            infoTextView?.text = "${userInfo?.firstName} ${userInfo?.lastName}"
-            avatarImageView?.load(userInfo?.avatar) {
+            binding.infoText.text = "${userInfo?.firstName} ${userInfo?.lastName}"
+            binding.avatarImage.load(userInfo?.avatar) {
                 // affiche une image par défaut en cas d'erreur:
                 error(R.drawable.ic_launcher_background)
                 transformations(CircleCropTransformation())
@@ -152,8 +170,32 @@ class TaskListFragment : Fragment() {
         viewModel.refresh()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+
+
     /*
     android:maxSdkVersion="28"
         tools:replace="android:maxSdkVersion"
      */
+}
+
+fun <T> Fragment.getNavigationResult(key: String = "result") =
+    findNavController().currentBackStackEntry?.savedStateHandle?.get<T>(key)
+
+fun <T> Fragment.getNavigationInfo(key: String = "result") =
+    findNavController().previousBackStackEntry?.savedStateHandle?.get<T>(key)
+
+fun <T> Fragment.getNavigationResultLiveData(key: String = "result") =
+    findNavController().currentBackStackEntry?.savedStateHandle?.getLiveData<T>(key)
+
+fun <T> Fragment.setNavigationResult(result: T, key: String = "result") {
+    findNavController().previousBackStackEntry?.savedStateHandle?.set(key, result)
+}
+
+fun <T> Fragment.setNavigationInfo(result: T, key: String = "result") {
+    findNavController().currentBackStackEntry?.savedStateHandle?.set(key, result)
 }

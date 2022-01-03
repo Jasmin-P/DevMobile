@@ -36,18 +36,20 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.util.*
 import android.app.Activity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.devmobilejasmin.todo.databinding.FragmentFormBinding
 import com.devmobilejasmin.todo.taskList.TaskListFragment
+import com.devmobilejasmin.todo.taskList.getNavigationInfo
+import com.devmobilejasmin.todo.taskList.setNavigationResult
 
 
-class UserInfoActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        binding = ActivityUserInfoBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
-
-
+class UserInfoActivity : Fragment() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.takePictureButton.setOnClickListener {
             launchCameraWithPermission()
@@ -58,15 +60,13 @@ class UserInfoActivity : AppCompatActivity() {
         }
 
         binding.modifyUserInformation.setOnClickListener {
-            val intent = Intent(this, UserFormActivity::class.java)
+            val intent = Intent(this.activity, UserFormActivity::class.java)
             intent.putExtra("userinfo", viewModel.userInfo.value)
             formLauncher.launch(intent)
         }
 
         binding.UserModificationValidationButton.setOnClickListener {
-            intent.putExtra("userInfo", viewModel.userInfo.value)
-            setResult(RESULT_OK, intent)
-            finish()
+            findNavController().popBackStack()
         }
 
 
@@ -104,13 +104,16 @@ class UserInfoActivity : AppCompatActivity() {
     }
 
 
+    private var _binding: ActivityUserInfoBinding? = null
+    private val binding get() = _binding!!
+
 
     private val viewModel: UserInfoViewModel by viewModels()
 
-    private lateinit var binding: ActivityUserInfoBinding
+    //private lateinit var binding: ActivityUserInfoBinding
     private lateinit var parentActivity: TaskListFragment
 
-    val mediaStore by lazy { MediaStoreRepository(this) }
+    val mediaStore by lazy { MediaStoreRepository(this.requireContext()) }
 
     private lateinit var photoUri: Uri
 
@@ -138,7 +141,7 @@ class UserInfoActivity : AppCompatActivity() {
 
     private fun launchCameraWithPermission() {
         val camPermission = Manifest.permission.CAMERA
-        val permissionStatus = checkSelfPermission(camPermission)
+        val permissionStatus = activity?.checkSelfPermission(camPermission)
         val isAlreadyAccepted = permissionStatus == PackageManager.PERMISSION_GRANTED
         val isExplanationNeeded = shouldShowRequestPermissionRationale(camPermission)
         when {
@@ -153,22 +156,25 @@ class UserInfoActivity : AppCompatActivity() {
 
     private fun showExplanation() {
         // ici on construit une pop-up système (Dialog) pour expliquer la nécessité de la demande de permission
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this.activity)
             .setMessage("🥺 On a besoin de la caméra, vraiment! 👉👈")
             .setPositiveButton("Bon, ok") { _, _ ->  }
             .setNegativeButton("Nope") { dialog, _ -> dialog.dismiss() }
             .show()
     }
 
+    /*
     private fun launchAppSettings() {
         // Cet intent permet d'ouvrir les paramètres de l'app (pour modifier les permissions déjà refusées par ex)
         val intent = Intent(
             Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-            Uri.fromParts("package", this.packageName, null)
+            Uri.fromParts("package", this.activity?.packageName, null)
         )
         // ici pas besoin de vérifier avant car on vise un écran système:
         startActivity(intent)
     }
+    */
+
 
     private fun handleImage(imageUri: Uri) {
         // afficher l'image dans l'ImageView
@@ -183,7 +189,7 @@ class UserInfoActivity : AppCompatActivity() {
         return MultipartBody.Part.createFormData(
             name = "avatar",
             filename = "temp.jpeg",
-            body = contentResolver.openInputStream(uri)!!.readBytes().toRequestBody()
+            body = getActivity()?.getContentResolver()?.openInputStream(uri)!!.readBytes().toRequestBody()
         )
     }
 
@@ -191,6 +197,24 @@ class UserInfoActivity : AppCompatActivity() {
         if (imageUri != null){
             viewModel.changeImage(convert(imageUri))
         }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        // Inflate the layout for this fragment
+
+        _binding = ActivityUserInfoBinding.inflate(inflater, container, false)
+        val view = binding.root
+
+        return view
+    }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

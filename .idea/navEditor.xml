@@ -13,8 +13,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="11" />
-                            <option name="y" value="143" />
+                            <option name="x" value="-5" />
+                            <option name="y" value="113" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -34,13 +34,13 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="formActivity">
+                  <entry key="formFragment">
                     <value>
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="987" />
-                            <option name="y" value="360" />
+                            <option name="x" value="1042" />
+                            <option name="y" value="536" />
                           </Point>
                         </option>
                       </LayoutPositions>
@@ -72,8 +72,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="312" />
-                            <option name="y" value="116" />
+                            <option name="x" value="302" />
+                            <option name="y" value="154" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -93,8 +93,8 @@
                       <LayoutPositions>
                         <option name="myPosition">
                           <Point>
-                            <option name="x" value="640" />
-                            <option name="y" value="367" />
+                            <option name="x" value="624" />
+                            <option name="y" value="347" />
                           </Point>
                         </option>
                         <option name="myPositions">
@@ -109,7 +109,24 @@
                                 <LayoutPositions />
                               </value>
                             </entry>
+                            <entry key="action_taskListFragment_to_userInfoActivity">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                           </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="userInfoActivity">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="1041" />
+                            <option name="y" value="121" />
+                          </Point>
                         </option>
                       </LayoutPositions>
                     </value>
