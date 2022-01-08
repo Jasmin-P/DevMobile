@@ -104,6 +104,7 @@ class FormActivity : Fragment() {
         binding.taskModificationValidationButton.setOnClickListener {
 
             val newTask = Task(id = id, title = binding.titleTextInput.text.toString(), description = binding.descriptionTextInput.text.toString())
+            setNavigationResult(true, "valid")
             setNavigationResult(newTask, "modifiedTask")
             findNavController().popBackStack()
         }

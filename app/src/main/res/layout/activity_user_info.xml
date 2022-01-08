@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingTop="24dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="24dp">
 
     <TextView
         android:id="@+id/user_first_name"
@@ -28,33 +31,33 @@
     <Button
         android:id="@+id/modify_user_information"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="60dp"
         android:text="Modifier les informations" />
 
     <ImageView
         android:id="@+id/current_image"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="150dp"
         tools:srcCompat="@tools:sample/avatars" />
 
     <Button
         android:id="@+id/upload_image_button"
         android:layout_width="match_parent"
-        android:layout_height="69dp"
+        android:layout_height="60dp"
         android:text="Choisir une Image" />
 
     <Button
         android:id="@+id/take_picture_button"
         android:layout_width="match_parent"
-        android:layout_height="67dp"
+        android:layout_height="60dp"
         android:text="Prendre une photo" />
 
     <Button
         android:id="@+id/User_modification_validation_button"
         android:layout_width="match_parent"
-        android:layout_height="66dp"
+        android:layout_height="60dp"
+        android:backgroundTint="@android:color/holo_green_dark"
         android:insetLeft="100dp"
         android:insetRight="100dp"
-        android:backgroundTint="@android:color/holo_green_dark"
         android:text="Valider" />
 </LinearLayout>

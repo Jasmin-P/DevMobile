@@ -42,17 +42,6 @@ import java.util.*
 
 class TaskListFragment : Fragment() {
 
-    val userActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        val userInfo = result.data?.getSerializableExtra("userInfo") as UserInfo
-
-        binding.infoText.text = "${userInfo.firstName} ${userInfo.lastName}"
-        binding.avatarImage.load(userInfo?.avatar) {
-            // affiche une image par défaut en cas d'erreur:
-            error(R.drawable.ic_launcher_background)
-            transformations(CircleCropTransformation())
-        }
-    }
-
     val adapter = TaskListAdapter()
 
     private val viewModel: TaskListViewModel by viewModels()
@@ -78,6 +67,9 @@ class TaskListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+
 
 
         val recyclerView = binding.recyclerView
@@ -117,10 +109,21 @@ class TaskListFragment : Fragment() {
             findNavController().navigate(R.id.action_taskListFragment_to_formActivity)
         }
 
-        val resultTask = this.getNavigationResultLiveData<Task>("modifiedTask")
+
+        val resultTask = getNavigationResultLiveData<Task>("modifiedTask")
         resultTask?.observe(viewLifecycleOwner){ task->
-            viewModel.createOrUpdate(task)
+            val isValid = getNavigationResult<Boolean>("valid")
+
+            if (isValid != null && isValid){
+                if (task != null){
+                    viewModel.createOrUpdate(task)
+                }
+                setNavigationInfo(false, "valid")
+            }
+
         }
+
+
 
         /*
         val resultUser = this.getNavigationResultLiveData<UserInfo>("user")
@@ -150,11 +153,13 @@ class TaskListFragment : Fragment() {
 
         lifecycleScope.launch {
             val userInfo = Api.userWebService.getInfo().body()
-            binding.infoText.text = "${userInfo?.firstName} ${userInfo?.lastName}"
-            binding.avatarImage.load(userInfo?.avatar) {
-                // affiche une image par défaut en cas d'erreur:
-                error(R.drawable.ic_launcher_background)
-                transformations(CircleCropTransformation())
+            if (_binding != null){
+                binding.infoText.text = "${userInfo?.firstName} ${userInfo?.lastName}"
+                binding.avatarImage.load(userInfo?.avatar) {
+                    // affiche une image par défaut en cas d'erreur:
+                    error(R.drawable.ic_launcher_background)
+                    transformations(CircleCropTransformation())
+                }
             }
         }
 
@@ -172,6 +177,7 @@ class TaskListFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+
         _binding = null
     }
 

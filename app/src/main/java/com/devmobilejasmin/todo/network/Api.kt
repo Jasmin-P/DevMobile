@@ -3,6 +3,7 @@ package com.devmobilejasmin.todo.network
 import android.content.Context
 import android.preference.PreferenceManager
 import android.util.Log
+import androidx.core.content.edit
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -25,8 +26,8 @@ object Api {
             .addInterceptor { chain ->
                 //val token = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo1ODYsImV4cCI6MTY3MjY5MDgyMH0.d5Ry6Wq3vXOtbHpIyicQtYrUhq-hj5OdabpaOYlkseg"
                 val response = PreferenceManager.getDefaultSharedPreferences(appContext).getString(SHARED_PREF_TOKEN_KEY, "error")
-                var token = ""
-                Log.i("debug Token", response.toString())
+                var token = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo1ODYsImV4cCI6MTY3Mjc2Mzk2M30.9PvZZ69lWjEX2iWm7NqwNUTJ6nd5YcA80iBro2bep-U"
+                //Log.i("debug Token", response.toString())
                     if (response != null && response != "error") token = response.split("=")[1].split(")")[0]
                 // intercepteur qui ajoute le `header` d'authentification avec votre token:
                 val newRequest = chain.request().newBuilder()
